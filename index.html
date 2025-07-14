@@ -10,24 +10,30 @@
     integrity="sha256-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44c="
     crossorigin=""
   />
-  <style>#map { height: 100vh; margin:0; padding:0; }</style>
+  <style>
+    #map { height: 100vh; margin:0; padding:0; }
+  </style>
 </head>
 <body>
 <div id="map"></div>
+
 <script 
   src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-o9N1j6kGQ+6rZeDGh+vPrdXCZ2w2sp5V5dC1ogpLFbA="
   crossorigin=""
 ></script>
 <script>
-  const map = L.map('map').setView([24.9, 72.9], 10); // Sirohi
+  const map = L.map('map').setView([24.9, 72.9], 10);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
   fetch('sirohiblock.geojson')
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error("GeoJSON not found");
+      return res.json();
+    })
     .then(data => {
       const layer = L.geoJSON(data, {
         style: {
@@ -39,8 +45,11 @@
       map.fitBounds(layer.getBounds());
     })
     .catch(err => {
-      console.error('Failed to load GeoJSON:', err);
-      document.body.innerHTML = '<p style="color:red;">Error loading GeoJSON — check console.</p>';
+      console.error('GeoJSON load error:', err);
+      const errorMsg = document.createElement('p');
+      errorMsg.style.color = 'red';
+      errorMsg.textContent = '❌ Failed to load GeoJSON. Check file name or open browser console.';
+      document.body.appendChild(errorMsg);
     });
 </script>
 </body>
