@@ -1,82 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Sirohi GeoJSON Test</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style> #map { height: 100vh; } </style>
-</head>
-<body>
-
-<div id="map"></div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Add leaflet-kmz plugin -->
-<script src="https://unpkg.com/leaflet-kmz@latest/dist/leaflet-kmz.js"></script>
-<script>
-  // Mandwa, Sirohi, Rajasthan coordinates
-  const defaultLat = 24.8825;
-  const defaultLng = 72.8725;
-  const map = L.map('map').setView([defaultLat, defaultLng], 13); // Center at Mandwa
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
-
-  // Show user location
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      L.marker([lat, lng]).addTo(map)
-        .bindPopup('You are here').openPopup();
-      map.setView([lat, lng], 13);
-    }, function(error) {
-      console.warn('Geolocation error:', error);
-    });
-  } else {
-    alert('Geolocation is not supported by your browser.');
-  }
-
-  // Load GeoJSON file instead of KMZ
-  fetch('Sirohi_block.geojson')
-    .then(response => response.json())
-    .then(data => {
       const layer = L.geoJSON(data, {
         style: {
           color: "green",
           weight: 1,
           fillOpacity: 0.3
+        },
+        onEachFeature: function (feature, layer) {
+          let popupContent = "<b>Information:</b><br>";
+          if (feature.properties && Object.keys(feature.properties).length > 0) {
+            for (const key in feature.properties) {
+              popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+            }
+          } else {
+            popupContent += "No information found.";
+          }
+          layer.bindPopup(popupContent);
         }
       }).addTo(map);
-      map.fitBounds(layer.getBounds());
-    })
-    .catch(error => {
-      console.error("Error loading GeoJSON:", error);
-      alert("GeoJSON failed to load. Check console for details.");
-    });
-
-  // Optionally, keep KMZ loading for future use
-  /*
-  const kmzLayer = new L.KMZLayer();
-  kmzLayer.on('load', function(e) {
-    map.addLayer(e.layer);
-    // Only fit bounds if valid
-    const bounds = e.layer.getBounds();
-    if (bounds.isValid && bounds.isValid()) {
-      map.fitBounds(bounds);
-    } else {
-      console.warn('KMZ loaded, but bounds are not valid.');
-    }
-  });
-  kmzLayer.on('error', function(e) {
-    alert('Failed to load KMZ file. Please check the file path and server configuration.');
-    console.error('KMZ load error:', e);
-  });
-  kmzLayer.load('Sirohi_block.kmz');
-  */
-</script>
-
-</body>
-</html>
