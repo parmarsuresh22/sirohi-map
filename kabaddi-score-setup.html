@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kabaddi Setup</title>
+<style>
+body{background:#111;color:white;font-family:Arial;text-align:center;padding:20px;}
+input{width:120px;padding:6px;margin:5px;border-radius:5px;text-align:center;border:none;}
+button{margin:5px;padding:8px 15px;border:none;border-radius:6px;background:#00ff88;color:black;font-weight:bold;cursor:pointer;}
+button:hover{background:#00cc70;}
+</style>
+</head>
+<body>
+<h2>🏆 Kabaddi Setup Panel 🏆</h2>
+
+<div>
+Team A: <input id="teamAInput" placeholder="Team A"> 
+<span id="scoreA">0</span>
+<button onclick="changeScore('A',1)">+1</button>
+<button onclick="changeScore('A',-1)">-1</button>
+</div>
+
+<div>
+Team B: <input id="teamBInput" placeholder="Team B">
+<span id="scoreB">0</span>
+<button onclick="changeScore('B',1)">+1</button>
+<button onclick="changeScore('B',-1)">-1</button>
+</div>
+
+<div>
+<button onclick="setNames()">✅ Set Names</button>
+<button onclick="resetScore()">♻️ Reset Score</button>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem('kabaddiScore')) || {teamA:'TEAM A', teamB:'TEAM B', scoreA:0, scoreB:0};
+
+// load existing
+document.getElementById('teamAInput').value = data.teamA;
+document.getElementById('teamBInput').value = data.teamB;
+document.getElementById('scoreA').textContent = data.scoreA;
+document.getElementById('scoreB').textContent = data.scoreB;
+
+function saveData(){ localStorage.setItem('kabaddiScore',JSON.stringify(data)); }
+
+function setNames(){
+  data.teamA = document.getElementById('teamAInput').value.trim() || 'TEAM A';
+  data.teamB = document.getElementById('teamBInput').value.trim() || 'TEAM B';
+  saveData();
+}
+
+function changeScore(team,val){
+  if(team==='A') data.scoreA=Math.max(0,data.scoreA+val);
+  else data.scoreB=Math.max(0,data.scoreB+val);
+  saveData();
+  updateDisplay();
+}
+
+function resetScore(){
+  data.scoreA=0;
+  data.scoreB=0;
+  saveData();
+  updateDisplay();
+}
+
+function updateDisplay(){
+  document.getElementById('scoreA').textContent=data.scoreA;
+  document.getElementById('scoreB').textContent=data.scoreB;
+}
+</script>
+</body>
+</html>

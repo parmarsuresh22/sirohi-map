@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kabaddi Overlay</title>
+<style>
+body{margin:0;background:transparent;font-family:Arial;overflow:hidden;}
+.scorebar{position:fixed;bottom:0;width:100%;background:rgba(0,0,0,0.8);color:white;display:flex;justify-content:space-around;align-items:center;padding:10px 0;border-top:3px solid #00ff88;}
+.team{display:flex;align-items:center;gap:15px;}
+.team-name{font-weight:bold;font-size:28px;color:#ffd700;}
+.score{font-size:48px;color:#00ff88;min-width:50px;text-align:center;}
+.center-title{font-weight:bold;font-size:22px;}
+</style>
+</head>
+<body>
+<div class="scorebar">
+  <div class="team">
+    <div id="teamAName" class="team-name">TEAM A</div>
+    <div id="scoreA" class="score">0</div>
+  </div>
+  <div class="center-title">🏆 Kabaddi Live 🏆</div>
+  <div class="team">
+    <div id="scoreB" class="score">0</div>
+    <div id="teamBName" class="team-name">TEAM B</div>
+  </div>
+</div>
+
+<script>
+function updateOverlay(){
+  const data = JSON.parse(localStorage.getItem('kabaddiScore')) || {};
+  document.getElementById('teamAName').textContent = data.teamA || 'TEAM A';
+  document.getElementById('teamBName').textContent = data.teamB || 'TEAM B';
+  document.getElementById('scoreA').textContent = data.scoreA ?? 0;
+  document.getElementById('scoreB').textContent = data.scoreB ?? 0;
+}
+
+// Polling every 100ms for real-time
+setInterval(updateOverlay,100);
+updateOverlay();
+</script>
+</body>
+</html>
+
